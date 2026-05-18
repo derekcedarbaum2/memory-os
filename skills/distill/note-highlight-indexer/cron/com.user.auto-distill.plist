@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  launchd plist for the auto-distill cron.
+  Schedule: 7:30 AM daily (local time).
+
+  SETUP:
+    1. Replace <YOUR_HOME> with the absolute path to your home directory.
+       (One-liner: sed -i '' "s|<YOUR_HOME>|$HOME|g" com.user.auto-distill.plist)
+    2. Copy to ~/Library/LaunchAgents/com.user.auto-distill.plist
+    3. Load: launchctl load ~/Library/LaunchAgents/com.user.auto-distill.plist
+    4. Verify: launchctl list | grep auto-distill
+
+  Note: launchd does NOT wake a sleeping Mac for StartCalendarInterval.
+  If the machine is asleep at 7:30 AM, the run fires on next wake.
+-->
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.user.auto-distill</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/bin/bash</string>
+        <string>-lc</string>
+        <string><YOUR_HOME>/.claude/hooks/auto-distill-readwise.sh</string>
+    </array>
+
+    <key>StartCalendarInterval</key>
+    <dict>
+        <key>Hour</key>
+        <integer>7</integer>
+        <key>Minute</key>
+        <integer>30</integer>
+    </dict>
+
+    <key>RunAtLoad</key>
+    <false/>
+
+    <key>StandardOutPath</key>
+    <string><YOUR_HOME>/.claude/logs/auto-distill.log</string>
+
+    <key>StandardErrorPath</key>
+    <string><YOUR_HOME>/.claude/logs/auto-distill.err</string>
+</dict>
+</plist>

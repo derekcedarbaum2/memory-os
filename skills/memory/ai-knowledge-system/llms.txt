@@ -1,0 +1,32 @@
+# ai-knowledge-system
+
+> Three-tier persistent-memory pattern for AI agents (Claude Code or Codex CLI). Stop re-explaining context to your AI agent. Project keys, API field IDs, vendor quirks, decisions get written once and recalled forever. Two skills (`/archive-session`, `/distill`) keep the knowledge base current.
+
+Battle-tested in production over 2026 Q1–Q2 by a PM running an AI agent daily across multiple products. PM-opinionated and shaped for PM work — PRDs, roadmaps, vendor research, board ops, methodology.
+
+## Docs
+
+- [README](https://raw.githubusercontent.com/derekcedarbaum2/ai-knowledge-system/main/README.md): what's in the repo, who it's for, what it's not.
+- [AGENTS.md](https://raw.githubusercontent.com/derekcedarbaum2/ai-knowledge-system/main/AGENTS.md): operating protocol for agents installing this for an operator.
+- [INSTALL-PROMPT.md](https://raw.githubusercontent.com/derekcedarbaum2/ai-knowledge-system/main/INSTALL-PROMPT.md): paste-this-into-your-agent installer (recommended).
+- [setup-claude-code.md](https://raw.githubusercontent.com/derekcedarbaum2/ai-knowledge-system/main/setup-claude-code.md): manual 15-min setup for Claude Code.
+- [setup-codex.md](https://raw.githubusercontent.com/derekcedarbaum2/ai-knowledge-system/main/setup-codex.md): manual 30-min setup for Codex CLI.
+
+## Skills
+
+- [archive-session SKILL.md](https://raw.githubusercontent.com/derekcedarbaum2/ai-knowledge-system/main/skills/archive-session/SKILL.md): end-of-session capture, routes decisions to the right domain file.
+- [distill SKILL.md](https://raw.githubusercontent.com/derekcedarbaum2/ai-knowledge-system/main/skills/distill/SKILL.md): cross-session reconciliation, dedupes and resolves stale open threads.
+
+## Templates
+
+- [MEMORY.template.md](https://raw.githubusercontent.com/derekcedarbaum2/ai-knowledge-system/main/templates/MEMORY.template.md): starter tier-2 index (platform-neutral).
+- [_learnings.template.md](https://raw.githubusercontent.com/derekcedarbaum2/ai-knowledge-system/main/templates/_learnings.template.md): starter tier-3 domain file (platform-neutral).
+
+## Examples
+
+- [example-MEMORY.md](https://raw.githubusercontent.com/derekcedarbaum2/ai-knowledge-system/main/examples/example-MEMORY.md): sanitized real tier-2 index.
+- [example-_learnings.md](https://raw.githubusercontent.com/derekcedarbaum2/ai-knowledge-system/main/examples/example-_learnings.md): sanitized real tier-3 file.
+
+## Optional
+
+- [LICENSE](https://raw.githubusercontent.com/derekcedarbaum2/ai-knowledge-system/main/LICENSE): MIT.

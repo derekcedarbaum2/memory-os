@@ -1,0 +1,24 @@
+# OS
+.DS_Store
+*.swp
+*~
+
+# Node
+node_modules/
+npm-debug.log*
+*.log
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+
+# Local state
+.claude/state/
+.claude/logs/
+*.tmp
+
+# Editor
+.vscode/
+.idea/

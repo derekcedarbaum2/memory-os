@@ -1,0 +1,23 @@
+# agentic-architecture-map
+
+> A living internal map of an AI agent system, with append-only evolution log. Snapshot rewritten in place, log appended on every structural change. One CLAUDE.md trigger keeps it maintained automatically. Stops setup drift before it starts.
+
+The pattern: one file with two halves — a 10-layer snapshot section (rewritten in place) and an append-only evolution log section (dated entries). Plus one CLAUDE.md trigger paragraph that instructs Claude Code to append a log entry whenever a structural change happens.
+
+## Docs
+
+- [README](https://raw.githubusercontent.com/derekcedarbaum2/agentic-architecture-map/main/README.md): the pattern, the 10 layers, why snapshot + log is the durable shape.
+- [AGENTS.md](https://raw.githubusercontent.com/derekcedarbaum2/agentic-architecture-map/main/AGENTS.md): operating protocol for agents installing this for an operator.
+
+## Templates
+
+- [agentic-architecture.template.md](https://raw.githubusercontent.com/derekcedarbaum2/agentic-architecture-map/main/template/agentic-architecture.template.md): starter file with all 10 layers and an append-only entry template at the bottom.
+- [claude-md-trigger.md](https://raw.githubusercontent.com/derekcedarbaum2/agentic-architecture-map/main/template/claude-md-trigger.md): the paragraph to add to operator's `CLAUDE.md` so structural changes auto-log.
+
+## Example
+
+- [agentic-architecture.example.md](https://raw.githubusercontent.com/derekcedarbaum2/agentic-architecture-map/main/example/agentic-architecture.example.md): sanitized real example with snapshot + 4 evolution log entries.
+
+## Optional
+
+- [LICENSE](https://raw.githubusercontent.com/derekcedarbaum2/agentic-architecture-map/main/LICENSE): MIT.

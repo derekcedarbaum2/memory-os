@@ -1,0 +1,22 @@
+# learnings-resurface
+
+> Weekly reconciliation pass over AI agent interaction memory. Clusters session archives, `_learnings.md` files, and voice memos; classifies patterns (principle / anti-pattern / state / commitment / open-question); routes per type. Source-diversity rule + artifact-type / optimization-target check + contradiction detection without auto-invalidation. Plain Markdown, no DB.
+
+The third leg of an auto-distill triad: external sources (Readwise) → playbooks; single voice-memo transcripts → vault routing; **accumulated internal interaction memory → cross-source pattern detection (this repo).**
+
+## Docs
+
+- [README](https://raw.githubusercontent.com/derekcedarbaum2/learnings-resurface/main/README.md): overview, install, tuning, what this is not.
+- [SKILL.md](https://raw.githubusercontent.com/derekcedarbaum2/learnings-resurface/main/skill/SKILL.md): the agent skill — input format, hard rules, two-phase workflow (Phase A cluster + classify; Phase B route + log) with explicit JSON contract between phases, anti-patterns, edge cases.
+- [Classification taxonomy](https://raw.githubusercontent.com/derekcedarbaum2/learnings-resurface/main/docs/classification-taxonomy.md): the five atom types (principle / anti-pattern / state / commitment / open-question) and routing rules in detail.
+- [Adapting to other vaults](https://raw.githubusercontent.com/derekcedarbaum2/learnings-resurface/main/docs/adapting-to-other-vaults.md): port to non-Obsidian / non-Claude-Code stacks.
+- [AGENTS.md](https://raw.githubusercontent.com/derekcedarbaum2/learnings-resurface/main/AGENTS.md): operating protocol for agents installing this repo.
+
+## Implementation
+
+- [Runner script](https://raw.githubusercontent.com/derekcedarbaum2/learnings-resurface/main/runner/learnings-resurface.sh): bash runner with concurrency lockdir.
+- [Launchd plist](https://raw.githubusercontent.com/derekcedarbaum2/learnings-resurface/main/launchd/com.user.learnings-resurface.plist): macOS weekly cron config (Sundays 10 PM).
+
+## Optional
+
+- [LICENSE](https://raw.githubusercontent.com/derekcedarbaum2/learnings-resurface/main/LICENSE): MIT.

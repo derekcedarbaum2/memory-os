@@ -1,0 +1,28 @@
+# adversarial-agent-pattern
+
+> The structural anti-sycophancy mechanism. Context-isolated agents with competing incentives plus arbitration. Documents the qa-loop / prd-review / pressure-test / sales-qa family — five design rules + a template for new members.
+
+LLMs are extremely competent at arguing almost any direction. Pointed at "is this PRD good?" they find issues. Pointed at "is this PRD ready to ship?" they defend it. Same model, same artifact, opposite verdicts. The fix is structural: don't ask one model for an opinion. Run multiple agents that can't agree because their assignments don't let them, then arbitrate. This repo is the pattern documentation.
+
+## Docs
+
+- [README](https://raw.githubusercontent.com/derekcedarbaum2/adversarial-agent-pattern/main/README.md): family overview, the five design rules (context isolation, competing incentives, direction assignment, arbitration, rewrite-only-what-survives), when to use which member.
+- [AGENTS.md](https://raw.githubusercontent.com/derekcedarbaum2/adversarial-agent-pattern/main/AGENTS.md): operating protocol for agents designing or installing family members.
+
+## Templates
+
+- [new-adversarial-skill.template.md](https://raw.githubusercontent.com/derekcedarbaum2/adversarial-agent-pattern/main/template/new-adversarial-skill.template.md): drop-in SKILL.md template for designing a new family member.
+
+## Design notes
+
+- [qa-loop design notes](https://raw.githubusercontent.com/derekcedarbaum2/adversarial-agent-pattern/main/examples/qa-loop-design-notes.md): annotated breakdown of `qa-loop`'s Finder / Disprover / Referee design.
+- [prd-review design notes](https://raw.githubusercontent.com/derekcedarbaum2/adversarial-agent-pattern/main/examples/prd-review-design-notes.md): annotated breakdown of `prd-review`'s BD / Engineering / Product / Referee design.
+- [pressure-test design notes](https://raw.githubusercontent.com/derekcedarbaum2/adversarial-agent-pattern/main/examples/pressure-test-design-notes.md): annotated breakdown of `pressure-test`'s Direction × Lens design.
+
+## Related
+
+- [qa-loop](https://github.com/derekcedarbaum2/qa-loop) — the published family member.
+
+## Optional
+
+- [LICENSE](https://raw.githubusercontent.com/derekcedarbaum2/adversarial-agent-pattern/main/LICENSE): MIT.

@@ -1,0 +1,21 @@
+{
+  "name": "vault-cli",
+  "version": "0.1.0",
+  "description": "Deterministic CLI primitives for an Obsidian vault + Claude Code agent setup. Wraps cron-driven hook scripts, exposes new primitives (skill scaffold/check, frontmatter audit, router check, learnings append). Skills call the CLI for deterministic work; the LLM does only judgment.",
+  "type": "module",
+  "bin": {
+    "vault": "src/cli.js"
+  },
+  "scripts": {
+    "test": "node --test src/**/*.test.js"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "license": "MIT",
+  "author": "Derek Cedarbaum",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/derekcedarbaum2/vault-cli"
+  }
+}

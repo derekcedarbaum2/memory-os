@@ -1,0 +1,40 @@
+# vault-cli
+
+> Deterministic CLI primitives for a Claude Code + Obsidian vault agent setup. Skills call this CLI for deterministic work (file ops, state mutations, router lookups, frontmatter audits, skill scaffolding). The LLM is left to do only judgment.
+
+The architectural anchor for the "LLMs offload deterministic work to scripts" pattern. v0.1 wraps existing hook scripts (so nothing breaks) plus ships native primitives for skill scaffolding/checking, frontmatter audit, router validation, and append-only learnings writes. Pure Node.js 22, no dependencies.
+
+## Docs
+
+- [README](https://raw.githubusercontent.com/derekcedarbaum2/vault-cli/main/README.md): full architecture, install, what v0.1 ships, migration plan.
+- [AGENTS.md](https://raw.githubusercontent.com/derekcedarbaum2/vault-cli/main/AGENTS.md): operating protocol for agents installing or calling this CLI.
+
+## Implementation
+
+- [src/cli.js](https://raw.githubusercontent.com/derekcedarbaum2/vault-cli/main/src/cli.js): top-level dispatcher.
+- [src/commands/distill.js](https://raw.githubusercontent.com/derekcedarbaum2/vault-cli/main/src/commands/distill.js): wraps auto-distill-readwise.sh + state ops.
+- [src/commands/resurface.js](https://raw.githubusercontent.com/derekcedarbaum2/vault-cli/main/src/commands/resurface.js): wraps learnings-resurface.sh + state ops.
+- [src/commands/session.js](https://raw.githubusercontent.com/derekcedarbaum2/vault-cli/main/src/commands/session.js): session archive ops.
+- [src/commands/voice-memo.js](https://raw.githubusercontent.com/derekcedarbaum2/vault-cli/main/src/commands/voice-memo.js): voice memo file ops.
+- [src/commands/router.js](https://raw.githubusercontent.com/derekcedarbaum2/vault-cli/main/src/commands/router.js): Knowledge Router lookup + validation.
+- [src/commands/frontmatter.js](https://raw.githubusercontent.com/derekcedarbaum2/vault-cli/main/src/commands/frontmatter.js): YAML frontmatter audit + backfill.
+- [src/commands/learnings.js](https://raw.githubusercontent.com/derekcedarbaum2/vault-cli/main/src/commands/learnings.js): append-only writes to _learnings.md.
+- [src/commands/skill.js](https://raw.githubusercontent.com/derekcedarbaum2/vault-cli/main/src/commands/skill.js): scaffold + check Claude Code skills.
+- [src/commands/state.js](https://raw.githubusercontent.com/derekcedarbaum2/vault-cli/main/src/commands/state.js): state file inspection.
+- [src/commands/today.js](https://raw.githubusercontent.com/derekcedarbaum2/vault-cli/main/src/commands/today.js): ephemeral working-memory artifact (Today.md) — path / read / stale / regenerate.
+- [src/lib/config.js](https://raw.githubusercontent.com/derekcedarbaum2/vault-cli/main/src/lib/config.js): env-var driven path resolution.
+- [src/lib/frontmatter.js](https://raw.githubusercontent.com/derekcedarbaum2/vault-cli/main/src/lib/frontmatter.js): YAML parser + validator.
+- [src/lib/state.js](https://raw.githubusercontent.com/derekcedarbaum2/vault-cli/main/src/lib/state.js): atomic state-file ops.
+
+## Related
+
+- [ai-knowledge-system](https://github.com/derekcedarbaum2/ai-knowledge-system): memory pattern this CLI's router commands target.
+- [vault-conventions](https://github.com/derekcedarbaum2/vault-conventions): frontmatter schema this CLI validates.
+- [learnings-resurface](https://github.com/derekcedarbaum2/learnings-resurface): cron + skill that `vault resurface run` wraps.
+- [note-highlight-indexer](https://github.com/derekcedarbaum2/note-highlight-indexer): cron + skill that `vault distill run` wraps.
+- [agentic-architecture-map](https://github.com/derekcedarbaum2/agentic-architecture-map): the architecture-tracking pattern this CLI represents a structural change to.
+- [claude-code-setup](https://github.com/derekcedarbaum2/claude-code-setup): the public PM Claude Code setup this CLI consolidates.
+
+## Optional
+
+- [LICENSE](https://raw.githubusercontent.com/derekcedarbaum2/vault-cli/main/LICENSE): MIT.

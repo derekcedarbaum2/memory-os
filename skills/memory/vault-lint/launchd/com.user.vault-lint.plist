@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Label</key>
+	<string>com.user.vault-lint</string>
+
+	<!-- Portable across users: shell expands $HOME at runtime. No edits required. -->
+	<!-- The claude binary is auto-discovered via 'command -v claude' so it works -->
+	<!-- whether claude lives at ~/.local/bin/claude, /usr/local/bin/claude, etc.   -->
+
+	<key>ProgramArguments</key>
+	<array>
+		<string>/bin/bash</string>
+		<string>-lc</string>
+		<string>mkdir -p "$HOME/.claude/logs" &amp;&amp; CLAUDE_BIN="$(command -v claude || echo $HOME/.local/bin/claude)" &amp;&amp; "$CLAUDE_BIN" -p "/vault-lint" &gt;&gt; "$HOME/.claude/logs/vault-lint-$(date +%Y-%m-%d).log" 2&gt;&amp;1</string>
+	</array>
+
+	<!-- Weekday: 0/7=Sun, 1=Mon, 2=Tue, 3=Wed, 4=Thu, 5=Fri, 6=Sat -->
+	<!-- Default: every Sunday at 06:00 local time -->
+	<!-- Rationale: Sunday morning is low-collision; the week starts with a fresh report -->
+	<key>StartCalendarInterval</key>
+	<dict>
+		<key>Weekday</key><integer>0</integer>
+		<key>Hour</key><integer>6</integer>
+		<key>Minute</key><integer>0</integer>
+	</dict>
+
+	<key>RunAtLoad</key>
+	<false/>
+</dict>
+</plist>

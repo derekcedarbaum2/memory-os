@@ -1,0 +1,33 @@
+# note-highlight-indexer
+
+> Paste anything you've read into Claude Code and have it distilled into operational rules in the right domain playbook. Daily cron + skill that converts Readwise highlights (articles, books, tweets) into scorecards, decision triggers, anti-pattern detectors, and fillable templates inside cross-vault playbook files. Plain Markdown, no vector DB.
+
+Sources are routed across a 10-domain playbook taxonomy. Two-column merge format makes provenance auditable: left column preserves source's exact framing, right column maps to existing playbook content + operator's context.
+
+## Docs
+
+- [README](https://raw.githubusercontent.com/derekcedarbaum2/note-highlight-indexer/main/README.md): overview, value, what this is not.
+- [architecture.md](https://raw.githubusercontent.com/derekcedarbaum2/note-highlight-indexer/main/architecture.md): 10-domain taxonomy, routing logic, merge format.
+- [setup-guide.md](https://raw.githubusercontent.com/derekcedarbaum2/note-highlight-indexer/main/setup-guide.md): step-by-step install.
+- [AGENTS.md](https://raw.githubusercontent.com/derekcedarbaum2/note-highlight-indexer/main/AGENTS.md): operating protocol for agents.
+
+## Skills
+
+- [auto-playbook-distill SKILL.md](https://raw.githubusercontent.com/derekcedarbaum2/note-highlight-indexer/main/skills/auto-playbook-distill/SKILL.md): headless / cron-driven distill (one Readwise file per invocation).
+- [playbook-distill SKILL.md](https://raw.githubusercontent.com/derekcedarbaum2/note-highlight-indexer/main/skills/playbook-distill/SKILL.md): interactive variant (paste content).
+
+## Implementation
+
+- [Cron runner](https://raw.githubusercontent.com/derekcedarbaum2/note-highlight-indexer/main/cron/auto-distill-readwise.sh): bash with concurrency lockdir.
+- [Vault templates](https://github.com/derekcedarbaum2/note-highlight-indexer/tree/main/vault-templates): starter Playbooks-Index.md + topic file format.
+- [Examples](https://github.com/derekcedarbaum2/note-highlight-indexer/tree/main/examples): sanitized examples of distilled output.
+
+## Related
+
+- [learnings-resurface](https://github.com/derekcedarbaum2/learnings-resurface): the *internal-source* counterpart (cross-vault interaction memory).
+- [ai-knowledge-system](https://github.com/derekcedarbaum2/ai-knowledge-system): memory pattern this writes into.
+- [vault-conventions](https://github.com/derekcedarbaum2/vault-conventions): frontmatter / vault structure.
+
+## Optional
+
+- [LICENSE](https://raw.githubusercontent.com/derekcedarbaum2/note-highlight-indexer/main/LICENSE): MIT.

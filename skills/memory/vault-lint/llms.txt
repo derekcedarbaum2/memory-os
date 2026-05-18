@@ -1,0 +1,25 @@
+# vault-lint
+
+> Weekly vault hygiene scan for markdown knowledge bases — broken wikilinks, contradictions, cross-layer drift, knowledge gaps. Severity-tagged report. Read-only by default. Plain Markdown, no DB.
+
+Audits a Markdown vault against the conventions in `vault-conventions`. Surfaces what's broken, stale, or contradictory. Reports; does not auto-fix.
+
+## Docs
+
+- [README](https://raw.githubusercontent.com/derekcedarbaum2/vault-lint/main/README.md): what gets audited, severity tags, how to interpret reports.
+- [SKILL.md](https://raw.githubusercontent.com/derekcedarbaum2/vault-lint/main/SKILL.md): the skill itself.
+- [AGENTS.md](https://raw.githubusercontent.com/derekcedarbaum2/vault-lint/main/AGENTS.md): operating protocol for agents installing this for an operator.
+
+## Implementation
+
+- [Launchd plists](https://github.com/derekcedarbaum2/vault-lint/tree/main/launchd): macOS periodic cron config.
+- [Examples](https://github.com/derekcedarbaum2/vault-lint/tree/main/examples): sanitized example reports.
+
+## Related
+
+- [vault-conventions](https://github.com/derekcedarbaum2/vault-conventions): the conventions vault-lint audits against.
+- [ai-knowledge-system](https://github.com/derekcedarbaum2/ai-knowledge-system): the memory pattern these conventions support.
+
+## Optional
+
+- [LICENSE](https://raw.githubusercontent.com/derekcedarbaum2/vault-lint/main/LICENSE): MIT.
