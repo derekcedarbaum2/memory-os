@@ -88,6 +88,16 @@ When the agent starts a session:
 
 The Letta benchmark on agent memory found that filesystem + iteration beats specialized retrieval. Trust the iteration loop.
 
+## Why 1-bit tiers and not soft scores
+
+The tier system is intentionally categorical: hot-or-cold, dormant-or-not, decay-low / -medium / -high (three discrete buckets, not a 0.0–1.0 continuous score). This looks unsophisticated next to a graph with weighted edges or a multi-dimensional importance score. It is unsophisticated. It is also the right call for this scale.
+
+Soft scores demand continual recalibration. A 0.74 importance score in March means something subtly different from a 0.74 in June, because the model that produced it shifted, because the corpus grew, because your work changed. The only way to keep soft scores meaningful over time is a continuous re-scoring pass — which is expensive, opaque to the user, and indistinguishable in practice from "the embedding drifted, please re-embed."
+
+Categorical tiers do not have this problem. "Hot pinboard" means "agent reads on every turn." "Dormant" means "no edit in 90 days." Both are auditable in one line. Both are reversible with one file move. The cost of categorical decisions at the boundaries — an entry that's genuinely 0.6-ish gets put in the wrong tier sometimes — is small compared to the cost of maintaining a recalibrated soft score.
+
+This is a deliberate simplification, not an oversight. Adopt it if you accept the tradeoff; layer in a graph or soft scoring if you don't.
+
 ## Cost model
 
 - **First read** of `MEMORY.md` in a session: ~$0.04 (uncached).

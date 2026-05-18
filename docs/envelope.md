@@ -96,16 +96,32 @@ To make the deferred-payoff argument concrete, here is what changes between week
 
 The asymptote isn't speed; it's the *quality of the agent's first turn in a new session*. Year-two Derek's agent starts every conversation already knowing his ventures, his preferences, his current open threads, the principles he's accumulated, and the dormancy state of every project. Week-one Derek's agent starts cold.
 
+## Taxonomy fossilization in year 3
+
+The honest version of the envelope concedes one more brittleness the rest of the doc doesn't fully name. A controlled vocabulary works for the duration of one stable cognitive frame. By year 2-3, three things have happened: new ventures the original taxonomy didn't anticipate; an inevitable job or role change that reshapes which `domain:` tags discriminate; semantic drift in what counts as a "principle" vs. "state" vs. "identity" entry as the work matures.
+
+Retroactively migrating 150 `_learnings.md` files when this happens is expensive, so most people don't, and the vocabulary silently drifts into uselessness — the tags stop returning useful results because they no longer carve nature at its joints.
+
+The honest mitigations:
+
+1. **Treat vocab refactor as a feature, not a failure.** Schedule a deliberate vocab review at roughly the 24-month mark. Run the tag-backfill script with new namespaces. The cost is a weekend, which is dramatically cheaper than re-embedding a vector store every six months as embedding models deprecate.
+2. **Accept some category bleed.** A "principle" you live by genuinely IS part of "identity." The `kind:` constraint is *exactly one for retrieval simplicity*, not a metaphysical claim about non-overlapping categories. Some entries will be mis-typed at the boundaries; the cost is acceptable as long as the bulk fits.
+3. **Surface the open question.** This repo has not yet survived year 3. The falsifying experiment — does the author refactor the vocab cleanly in 2028, or abandon the system? — is unresolved as of this writing.
+
+If you adopt memory-os and your taxonomy is showing strain at month 18, that is the system working as designed: a clear signal it's time to refactor, not a sign the substrate is wrong.
+
 ## When to abandon memory-os
 
 This is the honest part. memory-os should be abandoned, or at least drastically simplified, if:
 
 - The maintenance cron eats more time than it saves. (Symptom: skipping the weekly log review.)
-- The taxonomy becomes its own product instead of a means to an end. (Symptom: spending more time on the vocab than on the work.)
-- You change roles in a way that invalidates the venture taxonomy. (Symptom: half the pinboard is dormant within a month.)
-- A frontier lab ships a successor that does the operating-manual layer well enough. (Symptom: you read their docs and think "they actually got it.")
+- The taxonomy refactor becomes a quarterly event rather than a 24-month one. (Symptom: tag-vocabulary churn outpaces actual work.)
+- You change roles in a way that invalidates the entire venture taxonomy at once. (Symptom: 80% of the pinboard is dormant within a month and the new role has structurally different category needs.)
+- A frontier lab ships a successor that does the operating-manual layer well enough — *with portable export*. (Symptom: you read their docs and think "they got it, *and* my existing corpus imports cleanly.")
 
-The last one is the most likely failure mode. I expect Anthropic or OpenAI to ship something memory-os-shaped within three years. When that happens, this repo becomes a historical artifact and the lessons migrate into whatever they shipped. That is fine. The thesis is the contribution; the artifact is replaceable.
+The last one is the most likely failure mode. Realistic horizon: Anthropic and OpenAI are shipping operating-manual primitives now and will hit reasonable parity on the slots — `decay:`, `always-loaded`, controlled-vocab tags, cross-session reconciliation — inside roughly 18 months. When that happens, the question is whether your accumulated corpus migrates to the new platform or stays here. If it migrates cleanly, the platform won and that's fine — the value compounded into the corpus, not the substrate. If it doesn't, you keep the Markdown vault and the platform stays one layer up.
+
+Either way, the thesis is the contribution; the artifact is replaceable.
 
 ## Final test
 

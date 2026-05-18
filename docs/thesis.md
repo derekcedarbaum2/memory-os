@@ -20,7 +20,9 @@ This is not a clever optimization. It is recognizing that *for the single-knowle
 
 Frontier labs are racing to ship the storage layer. ChatGPT Memory. Claude Code's memory directory. Cursor Project Rules. Anthropic Skills. All shipped or in beta as of mid-2026. Inside 18 months, "your AI has persistent memory" will be a checkbox feature on every assistant.
 
-What labs cannot ship is the *operating manual* on top of the storage. That manual answers questions the model cannot answer for you:
+The labs will eventually ship the *slots* on top of the storage: `decay:` as a setting, "always loaded" as a toggle, server-side cross-session pattern detection, per-project memory profiles with user-defined tag namespaces. Some of this is already shipping. The realistic horizon for platform parity on the primitives is roughly 18 months, not three years.
+
+What labs will not give you is the *filled-in version* of those slots. The operating manual answers questions the model cannot answer for you:
 
 - When is a piece of information a *principle* (decision-time, fires on every relevant task) vs. *state* (snapshot of a venture, decays as the venture moves)?
 - Which `_learnings.md` does a meeting note belong in, and what happens to the file when the venture goes dormant?
@@ -30,7 +32,7 @@ What labs cannot ship is the *operating manual* on top of the storage. That manu
 
 These questions are not search-engine questions. They are taxonomy and policy questions. They depend on what *you* are trying to do, which the model cannot know in general because the model cannot read your roadmap, your family, your venture priorities, your taste.
 
-The labs will solve the storage layer in commodity. The operating manual layer is a write-it-yourself problem. memory-os is one worked example. The thesis is not that this particular taxonomy is right for everyone — it isn't — but that *the layer exists, has real structure, and is where the value lives once storage is free*.
+**The moat is not the architecture; it is having done the work.** Two years from now, when your AI assistant offers a "set decay schedule" dropdown, the people who have already accumulated 150 hand-curated `_learnings.md` files with stable tag vocabularies will compound on top of the new primitive. The people starting fresh will have a settings panel and an empty corpus. memory-os is one worked example of how to fill that corpus — published so you can fill yours faster, not as a claim that this particular taxonomy is right for everyone.
 
 ## Why filesystem + grep wins inside the envelope
 
@@ -44,7 +46,7 @@ The argument is not "Markdown is morally superior to vectors." The argument is t
 
 4. **Cost.** Once cached, the always-loaded MEMORY.md is fractions of a cent per turn. Vector stores charge per-call. For the single-worker case, the cached file always wins.
 
-The Letta team published a benchmark in late 2025 comparing filesystem retrieval against their own purpose-built memory system, against a frontier-tier agent. Filesystem won. Their explanation: capable models iterate and refine `grep` queries autonomously, and the iteration loop beats specialized retrieval at every scale that fits in one user's vault. memory-os builds on that result.
+Recent research on agent memory has found filesystem retrieval competitive with — and often better than — purpose-built retrieval systems, *when the agent is capable enough to iterate and refine queries autonomously* and *when the corpus is hand-named rather than ingested at scale*. Those two preconditions are exactly the single-knowledge-worker case. They are not the multi-tenant retrieval case, which is why this argument bounds itself to a specific envelope rather than claiming filesystem wins universally.
 
 ## What memory-os adds beyond "use grep"
 
@@ -82,7 +84,7 @@ The operating manual is built on top of one person's actual life and work. The v
 
 A stranger picking this repo up will need to throw out my taxonomy and write their own. That is fine. The contribution is not the taxonomy; it is *the existence of an opinionated taxonomy and a working enforcement loop* that you can copy the structure of. The repo is a worked example, not a framework.
 
-If "frontier labs will not ship this" sounds like wishful moat-talk, here is the more precise claim: frontier labs *cannot* ship this because the value is in the personalization, and personalization at the level required to actually be useful is, by definition, unproductizable. The labs will ship the storage. You write the manual. memory-os is one worked manual, published so you can write yours faster.
+If "frontier labs will not ship this" sounds like wishful moat-talk, here is the more precise claim: labs will ship the *slots* — `decay:`, `always-loaded`, scoped tag namespaces, cross-session reconciliation — within roughly 18 months. What they cannot ship is the filled-in version of those slots. You write the manual. memory-os is one worked manual, published so you can write yours faster, and so that when the platform exposes a settings panel for the slots, you already have content to fill them with.
 
 ## Where to read next
 

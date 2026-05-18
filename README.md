@@ -2,11 +2,11 @@
 
 **An operating system for an AI agent's long-term memory — written in Markdown, run on your filesystem, maintained by cron jobs you can read.**
 
-Frontier labs are racing to ship the *storage* layer for AI memory. ChatGPT has Memory. Claude Code has the memory directory. Cursor has Project Rules. Anthropic shipped Skills this year. Inside the next 18 months that layer will be commodity.
+Frontier labs are racing to ship the *storage* layer for AI memory. ChatGPT has Memory. Claude Code has the memory directory. Cursor has Project Rules. Anthropic shipped Skills this year. Inside the next 18 months that layer will be commodity, and the *slots* on top of it — `decay:` as a setting, "always loaded" as a toggle, controlled-vocab tag namespaces, cross-session reconciliation — will be table stakes for any agent platform that wants to keep paying users.
 
-The layer they will not ship is the *operating manual* on top of it — the controlled vocabulary, the hot pinboard vs. cold index, the 90-day dormancy rule, the `kind:` / `decay:` / `venture:` taxonomy, the cron that auto-decays stale entries and surfaces promotion candidates without asking. That layer is too personal to product-ize and too opinionated to default. It is also where most of the value lives once the storage stops being scarce.
+What labs cannot give you is the filled-in version of those slots. The moat is not the architecture; it is the accumulated corpus you have already curated by the time the platforms hand you a settings panel. Two years from now, when your AI assistant offers a "set decay schedule" dropdown, the people who have 150 hand-tagged `_learnings.md` files with stable vocabularies will out-compound the people starting from zero. The work is what compounds.
 
-`memory-os` is one worked example of that layer. It is what runs my actual day-to-day knowledge work — Product Management at Red 6 Aerospace, consulting at Unlikely Labs, four side ventures, and a household — across roughly 700 Markdown files in an Obsidian vault that a Claude Code agent reads from and writes to constantly.
+`memory-os` is one worked example of how to do that work — a snapshot of one knowledge worker's operating manual for the 18–24 month transition window before platform parity arrives. The substrate is filesystem-native and platform-portable, so when the parity lands, the corpus comes with you. It is what runs my actual day-to-day knowledge work — Product Management at Red 6 Aerospace, consulting at Unlikely Labs, four side ventures, and a household — across roughly 700 Markdown files in an Obsidian vault that a Claude Code agent reads from and writes to constantly.
 
 Everything in this repo is plain Markdown, plain text, plain Python, plain bash. No vector database. No SaaS. No proprietary format. You could read it with `cat` and grep it with `grep`. That is the point.
 

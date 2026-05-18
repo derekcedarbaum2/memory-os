@@ -67,9 +67,13 @@ Mem0 markets itself as the memory layer for LLM apps. Architecture: vector store
 
 ### Letta (formerly MemGPT)
 
-Letta ships a tiered memory model — core memory in context, recall memory in vector store, archival memory on disk. Architecture is more sophisticated than Mem0. They published a benchmark in late 2025 (paper: *MemGPT-style filesystem retrieval beats specialized memory systems for agents that can iterate*) that, read closely, actually argues against their own product for the single-worker case. The benchmark showed a capable frontier model with filesystem + `grep` beat their specialized memory layer.
+Letta ships a tiered memory model — *core memory* (a user-editable text block read on every turn), *recall memory* (a vector-store middle tier), and *archival memory* (long-tail storage). This is the most architecturally similar product to memory-os in the category. The shape is right: an always-loaded text surface the user controls, plus retrieval backstops behind it.
 
-**vs. memory-os:** Letta's three-tier model is structurally close to memory-os's hot/cold/per-venture split. The difference is implementation: Letta uses a vector store for the middle tier; memory-os uses cold Markdown files in `INDEX.md`. For one user, the latter wins on transparency and cost. For multi-tenant, Letta wins on scale.
+The differences are real but narrower than the rest of this category. Letta's middle tier is vector-backed, so its retrieval surface inside that tier shares the opacity and migration costs described above. Letta's controlled-vocabulary work happens via an LLM-driven memory CRUD that adapts the taxonomy from usage rather than freezing it in YAML the user maintains.
+
+**vs. memory-os:** Letta and memory-os agree on tiered memory more than this doc previously implied. The honest comparison: memory-os bets the controlled vocab is durable enough that hand-curation beats automated extraction *for one author over 18-24 months*; Letta bets the automated extraction beats hand-curation across longer horizons and broader use cases. Either could be right; the data is not in yet.
+
+memory-os wins on transparency at retrieval (every read is a file path you can audit) and on substrate longevity (no embedding-model migration). Letta wins on scale beyond one author and on automatic taxonomy adaptation. For multi-tenant or year-3+ use cases where vocabulary drift dominates, Letta is the better bet. For the 2-year single-author envelope this repo defines, memory-os is.
 
 ### Zep
 
