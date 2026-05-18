@@ -16,7 +16,8 @@ Everything in this repo is plain Markdown, plain text, plain Python, plain bash.
 
 ```
 memory-os/
-├── docs/                       The argument
+├── docs/                       The argument + how to actually run this
+│   ├── HOW-TO.md                  Daily/weekly/monthly rituals, bootstraps, failure modes, skill decision tree
 │   ├── thesis.md                  Writing-layer over retrieval-layer (long-form)
 │   ├── why-not-vectors.md         Where Mem0 / Letta / Zep / Cognee win, and where they lose
 │   └── envelope.md                When this approach works and when it doesn't
@@ -93,9 +94,11 @@ MIT. See [LICENSE](LICENSE).
 
 ## Further reading
 
+- [`docs/HOW-TO.md`](docs/HOW-TO.md) — daily/weekly/monthly rituals, bootstraps from zero, failure modes, the skill decision tree
 - [`docs/thesis.md`](docs/thesis.md) — the long-form argument
 - [`docs/why-not-vectors.md`](docs/why-not-vectors.md) — direct comparison with the vector-DB memory category
 - [`docs/envelope.md`](docs/envelope.md) — when this works and when it doesn't
 - [`vault/`](vault/) — the conventions in canonical form
 - [`skills/`](skills/) — the judgment layer, organized into four buckets
 - [`automation/`](automation/) — the self-healing layer
+- [`examples/pressure-test-on-self.md`](examples/pressure-test-on-self.md) — the repo's own adversarial review and the rewrites that resulted
