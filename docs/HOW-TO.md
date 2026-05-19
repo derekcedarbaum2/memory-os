@@ -1,69 +1,95 @@
-# How to build and run a memory-os vault
+# How to operate a memory-os vault
 
-You cloned `memory-os`. Now what? This doc answers four questions:
+You've got the substrate running. Now what? This doc covers ongoing operation. It assumes you've already done the install in [`QUICKSTART.md`](QUICKSTART.md) — if you haven't, start there.
 
-1. What do I do every day, week, and month to keep this thing alive?
-2. How do I bootstrap a vault from zero — and what does the first 6 months actually look like?
-3. What breaks, and how do I fix it?
-4. Which skill do I invoke when?
+Three things you'll get from reading this:
 
-Read the cheat sheet first if you already know the system. Read the narrative sections if you don't. Skip to "Failure modes" if something is currently on fire.
+1. A clear separation of **what the cron does automatically** (the load-bearing part) from **what you optionally do** (the polish on top).
+2. The skill decision tree, failure-mode triage, and "when NOT to use" matrix.
+3. The runnable version of the annual vocab refactor — the only thing about this system that genuinely demands a multi-week pass every couple years.
+
+---
+
+## What shape of work this assumes
+
+Before anything else: **memory-os was built for one specific shape of work.** It works for that shape. For other shapes, the architecture generalizes but the folder taxonomy and pinboard semantics need translation. If you skip this section and try to force your work into the default shape, you'll spend month one fighting the conventions before realizing the mismatch.
+
+**The assumed shape:** rolling parallel engagements with discrete identities. Roughly 5–8 active concerns at a time, each with its own folder, its own `_learnings.md`, its own decay cycle. New engagements start and old ones end on the order of months. This is consulting-shape, PM-shape, founder-shape — work where the *granularity is the venture or the client* and the parallelism is real.
+
+### Translations for other shapes
+
+If your work isn't like that, the architecture still generalizes — but you'll want to replace the folder taxonomy and rethink the pinboard. Three worked examples:
+
+**Academic researcher (one program, 4–6 sub-projects, 4–6 month review cycles):**
+- Replace `Work/Ideas/` with `Program/Papers/Grants/Collaborations/Reading/`.
+- Replace the active-venture pinboard with a *phase board*: what's in writing, what's in analysis, what's under review, what's blocked-on-external-dependency.
+- Replace the 90-day dormancy cron with a per-tag policy: `phase:under-review` has no decay; `phase:writing` decays at 30 days; etc. Edit `dormancy-decay.py` to read the `phase:` tag.
+- "Active ventures" in `MEMORY.md` becomes "Active phases" — sub-projects keyed by what verb they're at.
+
+**Indie hacker (one product, many features, release cycles):**
+- Replace `Work/Ideas/` with `Product/Features/Experiments/Customers/`.
+- Pinboard by feature release status, not parallel projects.
+- Dormancy is per release cycle, not 90 days.
+
+**Writer (one book, many chapters, draft-revise rhythm):**
+- Replace `Work/Ideas/` with `Manuscript/Research/Drafts/Notes/`.
+- Pinboard chapters by status (drafting / revising / cut / parked).
+- Dormancy doesn't apply the way the default cron assumes — chapters that aren't being touched are usually *finished*, not stale.
+
+In all three cases the substrate (Markdown + grep + `_learnings.md` + cron-driven maintenance) is correct. The folder names and decay policy aren't. Translate them once, then the rest of this doc applies.
+
+If your work doesn't match any of the four shapes named above, write down what your actual unit-of-work is before you build a vault. The convention is a means to an end; pick the version that fits.
 
 ---
 
 ## Cheat sheet
 
-### Daily rituals
+### What the cron does automatically (no human input)
 
-| Time | Action | Why |
+| Schedule | What runs | What you get |
 |---|---|---|
-| Morning, automatic | `Vault/Today.md` regenerates at 7:15am, 11am, 2pm, 5pm via cron | Working memory for time-sensitive tasks; never edit by hand |
-| Morning, automatic | Voice memos sync from your phone to `Vault/Voice Memos/` at 7:00am | Captures whatever you said into your phone walking the dog |
-| Morning, automatic | Readwise highlights auto-distill into domain playbooks at 7:30am | Yesterday's reading becomes today's operational rules |
-| Whenever a session ends | Run `/archive-session` | Captures decisions, insights, open threads to `Vault/AI Toolkit/CC Chat History/` |
-| Whenever you decide something venture-scoped | Append to that venture's `_learnings.md` — under `## Learnings` or `## Key Decisions` | If you don't write it down, it doesn't compound |
-| Whenever you have a thought you need outside your head | Talk to your phone (Monologue or equivalent); it lands in `Vault/Voice Memos/` next morning | Don't trust your brain to remember; trust the substrate |
+| Daily 7:00 AM PT | Voice memo sync | Phone memos land in `Vault/Voice Memos/` |
+| Daily 7:15, 11, 2, 5 PT | `generate-today.sh` | `Vault/Today.md` regenerated |
+| Daily 7:30 AM PT | `auto-distill-readwise.sh` | New Readwise highlights distilled into domain playbooks |
+| Sunday 10:00 PM PT | `learnings-resurface.sh` | Cross-corpus pattern detection; principles routed, commitments turned into tasks |
+| Sunday 11:00 PM PT | `weekly-memory-maintenance.sh` | Dormancy decay (90d), active-venture pinboard refresh, memory dir audit |
+| Per session end | `archive-session.sh` (hook) | Raw transcript saved to `Vault/AI Toolkit/CC Chat History/` |
 
-### Weekly rituals
+This layer is the load-bearing part. If you do nothing else, the cron keeps the system healthy.
 
-| When | Action | Why |
+### What you optionally do (when convenient)
+
+| When | What | Why bother |
 |---|---|---|
-| Sunday 10pm, automatic | `learnings-resurface` cron clusters the week's session archives + `_learnings.md` + voice memos, classifies by type, routes per type | Cross-corpus pattern detection; principles get promoted, commitments get tasks created |
-| Sunday 11pm, automatic | `weekly-memory-maintenance` cron runs dormancy-decay → active-venture-refresh → prune-memory-dryrun | Self-healing: stale ventures decay, stale pinboard entries demote, audit summary lands in `Vault/log.md` |
-| Monday morning | Skim `Vault/log.md` from last week (90 seconds) | Decide: agree with demotions? promote any candidates? confirm task creation? |
-| Mid-week, on demand | When a doc is shipping to a stakeholder, run `/qa-loop` on it | Three adversarial agents catch real issues; rewrites only what survives |
-| Mid-week, on demand | When a written argument is going public (essay, README, pitch), run `/pressure-test` on it | Adversarial personas attack from multiple directions; surfaces the load-bearing weakness |
-| Mid-week, on demand | When you've just dumped a lot of voice memos, run `/voice-memo-process` if it didn't auto-fire | Turns ephemeral talk into Todoist tasks or vault notes |
+| End of any non-trivial Claude Code session | `/archive-session` | Enriched metadata + insights extraction + project index update beyond what the raw hook captures |
+| Monday morning, when it fits | Skim last week's entries in `Vault/log.md` | Catch surprising cron output earlier than next week |
+| Whenever a doc is shipping to a stakeholder | `/qa-loop` on it | Three adversarial agents catch real issues before the stakeholder does |
+| Whenever an argument is going public | `/pressure-test` on it | Multi-persona adversarial attack on the load-bearing claims |
+| Whenever prose is soft but substance is solid | `/sense-of-style` | Pinker-grounded line-level rewrite |
+| Occasionally, when you remember | `/vault-lint --fix` | Catches drifted frontmatter, broken wiki-links, stale `_learnings.md`, missing tags |
+| Occasionally, when MEMORY.md feels bloated | `/prune-memory` | Audit + demote / consolidate |
 
-### Monthly rituals
-
-| When | Action | Why |
-|---|---|---|
-| First Monday of the month | Run `/vault-lint --fix` on the whole vault | Catches drifting frontmatter, broken wiki-links, stale `_learnings.md` files, missing tags |
-| First Monday of the month | Skim `INDEX.md` (the cold pointer index) | Things you haven't thought about; sometimes one surfaces as suddenly relevant |
-| First Monday of the month | Read your last month of session archive titles | Quick check: am I working on what I said I'd work on? |
-| First Monday of the month | Run `/prune-memory` if `MEMORY.md` is approaching 70 lines | Cap is 80; intervene before the cron has to truncate |
-| End of month, on demand | Check `Vault/AI Toolkit/agentic-architecture.md` Evolution log | Did any structural changes happen this month? Note them if not already logged |
+None of these are required. The cron-driven layer above keeps the system running indefinitely without any of these manual steps. These add polish. Treat them as *available* rather than *due*.
 
 ### Skill decision tree
 
-> **You have a piece of prose or an artifact. You're not sure if it's ready. Pick one:**
+> **You have an artifact. You're not sure if it's ready. Pick one:**
 
 ```
 Is it an ARGUMENT going public (essay, README, public pitch)?
-    YES → /pressure-test (4-persona adversarial attack)
+    YES → /pressure-test
     NO  ↓
 
 Is it a DELIVERABLE going to a stakeholder (PRD, proposal, brief)?
-    YES → /qa-loop (Finder/Disprover/Referee on substance)
+    YES → /qa-loop
     NO  ↓
 
-Is it WRITING where the substance is right but the prose is soft?
-    YES → /sense-of-style (Pinker-grounded line-level rewrite)
+Is the substance right but the prose soft?
+    YES → /sense-of-style
     NO  ↓
 
 Is it about the VAULT itself (orphans, broken links, drifting frontmatter)?
-    YES → /vault-lint (--fix for safe categories)
+    YES → /vault-lint  (add --fix for safe auto-corrections)
     NO  ↓
 
 Is it about MEMORY.md (oversized, stale entries, project_*.md leftovers)?
@@ -81,202 +107,208 @@ Probably no skill — just edit it.
 | A note you'll reread once in 48 hours and never again | Drop in `raw-sources/`; let it expire |
 | Highly confidential client work that can't co-mingle | Separate vault; don't fold into this one |
 | Bulk import of 100k+ documents you didn't write | Vector index over them; not Markdown + grep |
-| Multiple humans writing into the same corpus | Pick one taxonomic owner or use a vector store; don't try to enforce controlled vocab across writers |
+| Multiple humans writing into the same corpus | Pick one taxonomic owner or use a vector store; controlled vocab doesn't survive multiple writers |
 | Work that's identity-changing and invalidates 80% of your taxonomy | Pause; consider whether memory-os fits the new shape before forcing it |
 
-### Failure-mode quick triage
+### Failure-mode triage
 
 | Symptom | Likely cause | Quick fix |
 |---|---|---|
 | Cron didn't run Sunday night | Lockdir left over from a crashed run | `rm -rf /tmp/weekly-memory-maintenance.lock`, re-run manually |
-| `MEMORY.md` jumped to 100+ lines silently | Hot pinboard accumulating; cron didn't catch it | Run `/prune-memory`; demote stale entries to INDEX.md by hand |
-| Wiki-links suddenly broken everywhere | Renamed a file without updating references | `grep -r "\[\[old-name\]\]" Vault/` and fix the survivors |
-| Half my pinboard auto-demoted to dormant | You took a long break or changed roles | This is the system telling you something. Honor it or `touch` the files you actually want to keep active |
-| Tag drift mid-quarter (tags getting added ad hoc) | Adding new tags inline without updating `tag-vocabulary.md` first | Run `/vault-lint`, audit unknown tags, decide which to canonicalize and which to retag |
-| Year 2-3 vocabulary fossilization | The taxonomy no longer carves nature at its joints | See the **Annual vocab refactor** section below — it's a feature, not a failure |
+| `MEMORY.md` jumped to 100+ lines silently | Hot pinboard accumulating; cron only audits, doesn't auto-trim | Run `/prune-memory`; demote stale entries to INDEX.md |
+| Wiki-links suddenly broken everywhere | Renamed a file without updating references | `grep -r "\[\[old-name\]\]" Vault/` and fix references |
+| Half my pinboard auto-demoted to dormant | Long break, role change, or *in-flight blocked on external dependency* | If real activity is happening but invisible to the cron (waiting on reviewer 2, NIH study section, etc.), `touch` the file or add a `status:in-flight` tag and exclude it from the dormancy cron |
+| Tag drift mid-quarter | Adding new tags inline without canonicalizing | Run `/vault-lint`, audit unknown tags, decide which to canonicalize and which to retag |
+| You haven't done Monday review in 3 weeks | Life | See "What to do when you skip optional rituals" below |
+| Year 2-3 vocabulary fossilization | The taxonomy no longer carves nature at its joints | See **Annual vocab refactor** below — it's a multi-week process, not a weekend |
 
 ---
 
-## Narrative: the rituals
+## Narrative: what the cron actually does
 
-### Daily
+The architecture's central claim is *self-healing-via-cron*. Here's what that means in practice.
 
-The morning chain runs without you. By 7:30am your vault has: yesterday's voice memos turned into tasks or notes, a regenerated `Today.md` with calendar + due Todoist items + recent open threads, and the day's Readwise highlights distilled into the right domain playbook.
+**Sunday 10 PM PT** — `learnings-resurface.sh` fires. It reads every session archive, every `_learnings.md`, and every voice memo from the past week. Clusters semantically similar atoms across files. Applies the source-diversity rule (need ≥2 distinct human sources, not 3 voice memos from the same person). Classifies clusters by type (principle / anti-pattern / state / commitment / open question). Routes per type — principles into playbooks, commitments into Todoist, open questions into the relevant `_learnings.md`. Promotes cross-venture principles to `MEMORY.md` only if they fire across ≥2 ventures with ≥3 sources. Logs every routing decision to `Vault/log.md`.
 
-Your job in the morning is to read `Today.md`. That's it. Read it once around 9am and once around 2pm. It will tell you what's on fire.
+**Sunday 11 PM PT** — `weekly-memory-maintenance.sh` fires after the 10 PM job has settled. Three jobs in sequence: `dormancy-decay.py` (any `_learnings.md` with no edit in 90 days gets `status:dormant` in frontmatter), `active-venture-refresh.py` (pinboard entries whose `_learnings.md` is 90+ days untouched get demoted to `INDEX.md` "Dormant ventures"), `prune-memory-dryrun.py` (audit-only check: line count vs. 80-line cap, subfolder/filename consistency, tag-vocabulary compliance).
 
-Your job during the day is to capture into the right place. Two rules:
+**Daily 7 AM PT chain** — voice memo sync at 7:00, Today.md regenerate at 7:15, Readwise auto-distill at 7:30. By the time you sit down to work, the vault is current.
 
-- **A thought that's venture-scoped goes into that venture's `_learnings.md`.** Under `## Learnings` if it's an insight; under `## Open Threads` if it's a question; under `## Key Decisions` if you've decided something with a binary outcome. Always cite the source — at minimum a date, ideally a session ID once `/archive-session` has run.
-- **A thought that's not venture-scoped goes into a voice memo.** Walk outside, talk into your phone, forget about it. The morning cron handles the rest.
+**Per session** — `archive-session.sh` (a Claude Code SessionEnd hook, not a cron) writes raw session transcripts to `Vault/AI Toolkit/CC Chat History/`. Running `/archive-session` interactively enriches that raw archive with metadata extraction.
 
-End-of-session, run `/archive-session`. It snapshots the conversation, extracts decisions and insights and open threads, writes a session archive to `Vault/AI Toolkit/CC Chat History/`, updates the project index, and rolls fresh insights into the cumulative learnings file. The skill takes 30 seconds. Skipping it loses you the compounding effect entirely. Don't skip it.
+What this means concretely: **you can skip every optional ritual below and the system still compounds.** The cron will surface dormancy decisions, promotion candidates, and weekly summaries on its own. The append-only `_learnings.md` discipline is event-driven (you write when you decide), not calendar-driven. The cron handles the calendar.
 
-### Weekly
-
-Sunday night, the system audits itself. Two crons fire — `learnings-resurface` at 10pm and `weekly-memory-maintenance` at 11pm — and by Monday morning `Vault/log.md` has the audit trail. Read it Monday before opening anything else. It takes 90 seconds.
-
-You're looking for:
-
-- **Promotion candidates.** Files the cron noticed you've been touching frequently but that aren't on your `MEMORY.md` hot pinboard. Promote (move the pointer to `MEMORY.md`), ignore (file is incidental), or leave for next week. Maybe 1 in 5 gets promoted.
-- **Demoted ventures.** Files that have gone dormant. Agree (let it stand) or disagree (touch the file to reset the clock). Almost always agree.
-- **Routed principles.** Cross-corpus patterns the cron promoted into your playbook. Read the new entry, sanity-check the routing, edit if needed.
-- **Auto-created Todoist tasks.** Commitments the cron extracted from session archives. Confirm they ended up in the right project; rephrase if the auto-generated title is rough.
-
-Mid-week, the on-demand skills earn their keep. `/qa-loop` before you send a PRD to engineering. `/pressure-test` before you publish a public argument. `/sense-of-style` before you publish prose where the substance is solid but the lines are soft. Don't run all of them on everything — that's noise. Pick the one whose specific incentive matches what the artifact needs.
-
-### Monthly
-
-The first Monday of the month is hygiene day. Block 30 minutes. In order:
-
-1. **`/vault-lint --fix`** on the whole vault. Catches drifted frontmatter, broken wiki-links, stale `_learnings.md`, missing tags. Auto-fixes the safe categories with your approval.
-2. **Skim `INDEX.md`** (the cold pointer index). Things you haven't thought about. Sometimes one surfaces as suddenly relevant — promote it to `MEMORY.md`.
-3. **Read your last month of session archive titles.** Are you working on what you said you'd work on? If not, why? Adjust the active-venture pinboard.
-4. **Run `/prune-memory`** if `MEMORY.md` is creeping past 70 lines. The cap is 80, and the cron will warn you, but you'd rather intervene yourself than have entries auto-demoted.
-5. **Glance at `agentic-architecture.md`'s Evolution log.** Did anything structural change this month that didn't get logged? Add a backfill entry.
-
-Monthly hygiene is the difference between a vault that compounds for two years and a vault that rots in six months. Don't skip it.
+The optional human practices below are about *catching things earlier* than the next cron run, *acting on candidates the cron surfaces*, and *applying quality skills* to artifacts that are about to leave your hands. None of them are load-bearing.
 
 ---
 
-## Narrative: bootstraps
+## Narrative: optional human practices
 
-### Starting from zero — a new vault
+### Capturing into the right place (event-driven, not calendar-driven)
 
-A common failure mode for adopters is to clone `memory-os`, expect the system to work on day one, and abandon it when the agent's first session doesn't feel transformed. This is the deferred-payoff problem: memory-os doesn't pay value linearly from day one like a vector store does. It pays asymptotically — close to zero in week one, useful by month two, dominant by month six.
+When you decide something venture-scoped, write it down. Append to that venture's `_learnings.md` under `## Key Decisions` if it has a binary outcome, `## Learnings` if it's an insight, `## Open Threads` if it's unresolved. This is the *only* practice that's genuinely load-bearing on the human side, because the cron can't write decisions you didn't capture.
 
-**Week 1 — Substrate setup.**
-- Set up your Markdown vault (Obsidian recommended, but any folder of `.md` files works).
-- Drop in the `vault/` reference docs from `memory-os` so the conventions are visible.
-- Create the top-level folders: `Work/`, `Ideas/`, `Personal/`, `Writing/`, `Reading/`, `AI Toolkit/`, `Company Building/`, `_archive/`.
-- Set up your `CLAUDE.md` at the vault root pointing the agent at the conventions.
-- Set up `MEMORY.md` in your Claude Code memory directory with the hot-pinboard template (see `vault/memory-protocol.md`).
-- Tag every file you write going forward with controlled-vocab tags. Empty `tags: []` is an enforced error.
+When you have a thought that doesn't fit anywhere yet, talk into your phone. Whatever voice-memo tool you use (Monologue, Otter, whatever), it lands in `Vault/Voice Memos/` overnight and the daily auto-distill chain handles routing.
 
-The vault is basically empty. The agent has no context yet. This is expected.
+When a Claude Code session has produced meaningful decisions or insights, run `/archive-session` before closing it. The raw SessionEnd hook captures the transcript; the interactive skill enriches it with metadata extraction. The enriched version compounds; the raw version doesn't.
 
-**Week 2 — Start populating.**
-- Pick your three most active engagements. Create a folder for each under `Work/` or `Ideas/`. Create a `_learnings.md` in each from `vault/learnings-template.md`.
-- Start using `/archive-session` after every Claude Code session.
-- Run a voice-memo sync if you have a service like Monologue. If not, manually capture thoughts into a `Voice Memos/` folder.
-- Don't worry yet about the principle layer or cross-corpus reconciliation. Just write decisions and learnings into the venture `_learnings.md` as they happen.
+### Reading the weekly log (when it fits)
 
-**Month 1 — Tag vocab and pinboard.**
-- By now you should have 20-30 `_learnings.md` files and a couple dozen session archives.
-- Audit your tags. Add to `tag-vocabulary.md` if you're using terms not in the controlled set. The vocab is yours; the discipline is the convention.
-- Set up your `MEMORY.md` active-venture pinboard with the 5-7 you actually work on. The rest are cold pointers in `INDEX.md`.
-- Install the weekly cron (`weekly-memory-maintenance.sh` + the launchd plist) so Sunday-night maintenance starts running.
-- Don't expect the cron to do anything dramatic yet — there's not enough corpus to find patterns in.
+Sometime Monday or Tuesday — or whenever you next sit down for focused work — open `Vault/log.md` and scroll to the most recent Sunday-11 PM `weekly-memory-maintenance` block. Read the summary lines from the two crons. Three things to look at:
 
-**Month 3 — Pattern surfacing.**
-- The weekly cron should now find real things. Cross-venture principles surface in `Vault/log.md` Monday mornings.
-- Promote 2-3 of these principles to inline rules in `MEMORY.md`. They should be decision-time-load-bearing — fire on every relevant task.
-- Run `/prune-memory` and `/vault-lint --fix` for the first time. Expect a lot of small issues to surface; spend an afternoon cleaning them up. After this, monthly maintenance gets fast.
+1. **Demoted ventures.** Files the cron moved from hot pinboard to cold index. Almost always agree. If one feels wrong, the venture is in-flight-but-blocked rather than dormant — touch the file or add `status:in-flight` and exclude it from future dormancy runs.
+2. **Promotion candidates.** Files touched recently that aren't on the pinboard. Read the file. Promote if it's compounding into something real; ignore if incidental.
+3. **Routed principles.** Cross-corpus patterns the cron promoted into a playbook. Read the new entry, sanity-check the routing, edit if needed.
 
-**Month 6 — Compounding.**
-- ~80 `_learnings.md` files. Twenty inline principles or so. Hot pinboard saturated at 7-8 active ventures. Cold index has dozens of locations.
-- The cron now produces signal-dense weekly summaries. 90 seconds of Monday reading and you know what changed.
-- The agent now starts every session already knowing your ventures, preferences, current open threads, and the principles you've accumulated.
-- This is when memory-os pays back. Year-one Derek had to re-explain himself every session. Month-six Derek's agent starts warm.
+If you don't get to this in any given week, the cron still ran. The next week's log will show both weeks of decisions. Nothing breaks.
 
-If you abandon the system in week 4 because it doesn't feel transformative yet, you've abandoned it on the steepest part of the deferred-payoff curve. The value is on the far side of that valley, not in week one.
+### Running quality skills on outgoing artifacts
 
-### Starting a new venture inside an existing vault
+Three skills earn their keep at specific moments:
 
-When you start a new venture or engagement, the bootstrap is much smaller. The convention does most of the work.
+- `/qa-loop` before a deliverable goes to a stakeholder (PRD, proposal, brief)
+- `/pressure-test` before an argument goes public (essay, README, pitch)
+- `/sense-of-style` when the substance is solid but the prose is soft
 
-1. **Pick the right parent folder.** `Work/` for paid engagements; `Ideas/` for pre-revenue ventures; `Personal/` for life stuff. If it doesn't fit any of these, you might be over-categorizing — just put it in `Ideas/` and let it earn a graduation later.
-2. **Create the venture folder.** Folder name = the venture name, no boilerplate.
-3. **Create `_learnings.md`** from `vault/learnings-template.md`. Set the frontmatter:
-   - `title`: `<venture> — Learnings`
-   - `tags`: `[venture:<slug>, kind:state, decay:high]`
-   - `classification`: usually `internal` or `confidential` depending on whether it's a client engagement
-4. **Write the status snapshot.** One paragraph. What is this venture? Who's involved? What's load-bearing right now? Update this section in place over time; it's the only section that's not append-only.
-5. **Add to `MEMORY.md` pinboard** if this is one of your active engagements. Otherwise add to `INDEX.md` cold pointers.
-6. **Optionally create `_strategy.md`** as a sibling file if there's a durable strategic anchor (5-field strategy template, North Star, etc.). The `_strategy.md` doesn't change much; the `_learnings.md` accumulates.
-7. **Optionally create subfolders** as work happens. Don't pre-build them. `Meetings/`, `Research/`, `Deliverables/` accrete naturally when there's actual content to put in them. Build the folders when you have files to put in them, not before.
+Don't run all three on everything. Pick the one whose specific incentive matches what the artifact needs. The skill decision tree in the cheat sheet is the lookup.
 
-The new-venture bootstrap takes ~5 minutes. The conventions are doing the heavy lifting.
+### Monthly hygiene (genuinely optional)
+
+If you have time, once a quarter is fine, do:
+
+- `/vault-lint --fix` on the whole vault.
+- Skim `INDEX.md` to catch anything dormant that's quietly become relevant.
+- Read your last month of session archive titles to confirm you're working on what you intended to.
+
+If you don't have time, the cron's weekly audit catches most of the same things on a longer lag. The difference between doing this monthly and doing it never is real but small — call it 5–10% better signal density. The difference between doing the cron and not doing the cron is much larger.
 
 ---
 
-## Narrative: failure modes and recovery
+## What to do when you skip optional rituals for 3+ weeks
 
-### "My Sunday cron didn't run"
+This will happen. A deadline lands, you travel, family stuff, sickness. You stop reading the Monday log, you stop running `/archive-session`, the human layer goes silent for a month.
 
-Cause is almost always a leftover lockdir from a crashed previous run. The wrapper script uses `mkdir`-based locking with a stale-lock cleanup at 2 hours, but if your machine was asleep at the auto-clean window, the lock can persist.
+When you come back:
 
-Fix:
+1. **Read `Vault/log.md` from the silent period forward.** This is the longest part of the recovery. Probably 5–15 minutes.
+2. **Skim the demoted ventures.** Anything that got marked dormant during the gap that's actually still active needs a `touch` or a frontmatter edit to revive.
+3. **Skim accumulated promotion candidates.** The cron has been surfacing files; you've been ignoring them. Decide which to promote, mark the rest as "reviewed, not promoting."
+4. **Run `/prune-memory`** to catch anything that drifted in `MEMORY.md`.
+5. **Run `/vault-lint`** (read-only first; `--fix` if it looks safe) to catch frontmatter or wiki-link issues that built up.
+6. **Start running `/archive-session` again.** The sessions you ran during the silent period have raw archives but no enriched metadata; the project indexes are stale by however much.
+
+Recovery takes one focused 30-minute pass. The system doesn't punish you for the gap — the cron kept running, the substrate kept absorbing, the only thing you lost is some catch-up time.
+
+The point: **the architecture survives ritual lapses.** If it didn't, it would be a discipline-gated system pretending to be self-healing, which is the failure mode of every productivity framework written before this one. memory-os is built to survive your bad weeks; act like it does.
+
+---
+
+## Annual vocab refactor — the runnable version
+
+The controlled vocabulary survives roughly 18–24 months of stable cognitive frame. After that, the corpus contains new ventures the taxonomy didn't anticipate, role changes that reshape which `domain:` tags discriminate, and semantic drift in what counts as a "principle" vs. "state" vs. "identity."
+
+Refactoring the vocab is a multi-week elapsed process — not a weekend. About 8–16 hours of focused work, but spread across 2–3 calendar weeks because day 1 surfaces ambiguities that need background processing before you can resolve them. The actual steps:
+
+### Step 1 — Dependency audit (1 hour, day 1)
+
+Before you rename anything, find every skill, script, hook, and cron that hard-codes a tag. Grep is your friend:
+
 ```bash
-rm -rf /tmp/weekly-memory-maintenance.lock
-bash ~/.claude/hooks/weekly-memory-maintenance.sh
+# Every controlled tag value, where it's referenced:
+grep -rE "kind:(identity|feedback|state|principle|location|pipeline|gotcha)" ~/.claude/skills/ ~/.claude/hooks/ ~/.claude/reference/
+grep -rE "decay:(low|medium|high)" ~/.claude/skills/ ~/.claude/hooks/ ~/.claude/reference/
+grep -rE "venture:[a-z-]+" ~/.claude/skills/ ~/.claude/hooks/ ~/.claude/reference/
 ```
 
-Check `~/.claude/logs/weekly-memory-maintenance.log` for the actual error. If a Python script crashed, the underlying file system state is fine (the scripts are idempotent) — just rerun.
+Write down every file that references each tag value. These are your *renames-with-cascade*. Renaming a tag without updating these silently produces wrong cron output for weeks.
 
-### "MEMORY.md is over 80 lines and the cron didn't catch it"
+### Step 2 — Usage audit (30 minutes, day 1)
 
-Likely cause: the prune-memory cron runs in dry-run only — it audits and warns but doesn't auto-trim. You need to intervene.
+Count tag usage across the vault and memory dir:
 
-Fix: run `/prune-memory` interactively. The skill surfaces:
-- Duplicates with CLAUDE.md (delete)
-- Entries that should be in INDEX.md instead of MEMORY.md (demote)
-- Stale entries (review with you)
-
-If `MEMORY.md` is creeping over 80 chronically, that's a signal you're trying to put too much on the hot pinboard. Demote ruthlessly. The pinboard is for the 5-7 things you actually need in every session — not 30.
-
-### "Wiki-links are suddenly broken across the vault"
-
-You renamed a file without updating references. Or moved a file to `_archive/` without re-routing.
-
-Fix:
 ```bash
-grep -r "\[\[old-name\]\]" "/path/to/Vault/" | head
+grep -rohE "(kind|decay|venture|domain|status):[a-z-]+" \
+    "$VAULT" ~/.claude/projects/-Users-*/memory/ \
+  | sort | uniq -c | sort -rn > /tmp/tag-usage.txt
 ```
 
-Then either rename the link target back, or do a vault-wide find-replace to update references. `/vault-lint` will surface the broken links as warnings; the auto-fix is suggestive only — it proposes the most likely correct target but won't write the fix.
+Read `tag-usage.txt`. Don't trust frequency heuristics blindly:
 
-### "Half my pinboard auto-demoted to dormant"
+- **Low-frequency tags can be load-bearing.** A `domain:hiring` used 4 times where each use was a major hire decision is more important than a `domain:misc` used 200 times.
+- **High-frequency tags can be either signal or noise.** `kind:reference` *should* be high-count by design. Frequency alone doesn't tell you which.
 
-Two possibilities. One: you took a long break (vacation, illness, family) and the 90-day dormancy clock caught up. Two: you changed roles and the venture taxonomy is genuinely out of date.
+For each tag value, decide: keep / merge into another / split into multiple / retire. Write the decisions in a scratch file — you'll need them in step 4.
 
-If it's a break: just `touch` the files you actually want active, or edit them to reset the clock. The cron is mechanical and doesn't know context.
+### Step 3 — Draft the new vocabulary (2–4 hours, day 1–2)
 
-If it's a role change: this is the system telling you something. Resist the urge to override. Spend 30 minutes asking: which of these ventures are dead, which are paused-but-real, which are truly active under the new shape? Then rebuild the pinboard with the survivors.
+Open `~/.claude/reference/tag-vocabulary.md`. Mark deprecated values with `(deprecated, see <new-value>)`. Add new values. Don't delete old values yet.
 
-### "Tag drift mid-quarter"
+Important: most non-trivial renames are *one-to-many* depending on context. A `kind:principle` entry might now be `kind:identity` (if it's about who you are) or `kind:feedback` (if it's a learned preference). The new vocabulary needs to capture both meanings; the migration script can't decide which one applies to each file.
 
-You've been adding ad-hoc tags inline instead of canonicalizing them in `tag-vocabulary.md`. The audit catches it.
+Save the draft. Sleep on it. Day-1 ambiguities surface as day-2 clarifications about 80% of the time. The remaining 20% need real thought.
 
-Fix:
-1. Run `/vault-lint` to surface the unknown tags.
-2. For each unknown tag, decide: add to vocabulary, or rewrite the entries that use it to use a canonical tag.
-3. Update `tag-vocabulary.md` first, then use the new tag — never inline, then retrocanonical.
+### Step 4 — Human-adjudication pass (4–8 hours, days 3–14)
 
-If you find yourself adding 3+ new tags a month, the vocabulary itself may be drifting. Time for the annual refactor (see below) earlier than scheduled.
+For each file whose tags will change, decide what the new tags should be. The mechanical part is a script; the *deciding* is the work.
 
-### Annual vocab refactor (year 2-3)
+Generate a migration plan:
 
-This is the big one. The repo's `envelope.md` is honest about it: a controlled vocabulary survives roughly 18-24 months of stable cognitive frame. After that, the corpus contains ventures the original taxonomy didn't anticipate, role changes that reshape which domains discriminate, and semantic drift in what counts as a "principle" vs. "state" vs. "identity."
+```bash
+python3 ~/.claude/hooks/tag-backfill.py --plan-only > /tmp/migration-plan.json
+```
 
-The refactor playbook:
+(You'll need to extend `tag-backfill.py` to support `--plan-only` mode that outputs proposed changes per file rather than applying them. The current version only enforces; extend it for refactor.)
 
-1. **Block a weekend.** Don't try to do this in pieces. It's a single coherent surgical pass.
-2. **Audit current tag usage.** Run a `grep -c` over each tag in `tag-vocabulary.md`. Tags with <5 uses are probably dead. Tags with >100 uses are probably non-discriminating.
-3. **Draft the new vocabulary.** Add new namespaces or values that the last 12 months of work would have wanted. Mark old values as deprecated but don't delete yet.
-4. **Write a migration script.** Extend `tag-backfill.py` to map old tags to new tags. Run in dry-run first. Inspect the diff. Run for real.
-5. **Update `tag-vocabulary.md`** to reflect the new state. Remove deprecated values.
-6. **Run `/vault-lint --fix`** to catch any lingering references to old tags.
-7. **Log the refactor** as an Evolution log entry in `agentic-architecture.md`. Note what changed, why, and what the next refactor will likely need to address.
+Read the plan. For each file where the proposed change is ambiguous (multiple possible new tags), open the file, read it, decide. Annotate the plan with your decision. This is the part that takes 2–3 weeks elapsed — you can't do it all in one sitting, and the ambiguities accumulate as you uncover them.
 
-The refactor takes a weekend every 24 months. That's much cheaper than re-embedding a vector store every 6 months, which is the equivalent maintenance cost on the other architecture.
+### Step 5 — Run the migration in dry-run (1 hour)
 
-If you ever find yourself doing the refactor *quarterly*, the system is wrong for your work. Either your work is changing faster than any taxonomy can keep up (consider a hybrid graph-extraction layer) or you're over-engineering the vocab. Step back.
+```bash
+python3 ~/.claude/hooks/tag-backfill.py --migration-plan /tmp/migration-plan.json --dry-run
+```
+
+Inspect the diff. If anything surprises you, go back to step 4 for that file.
+
+### Step 6 — Apply the migration (15 minutes)
+
+```bash
+python3 ~/.claude/hooks/tag-backfill.py --migration-plan /tmp/migration-plan.json
+```
+
+### Step 7 — Update dependent skills and scripts (1–2 hours)
+
+For every reference found in step 1 (dependency audit), update the hard-coded tag value to the new vocabulary. Re-run the dependency-audit greps to confirm zero remaining references to deprecated values.
+
+### Step 8 — Update `tag-vocabulary.md` (15 minutes)
+
+Remove the deprecated values. The vocabulary is now clean.
+
+### Step 9 — Post-refactor validation (1 hour)
+
+Did the refactor actually work? Run the routing crons in dry-run mode to confirm:
+
+```bash
+python3 ~/.claude/hooks/learnings-resurface.py --dry-run  # confirm principle routing still finds principles
+python3 ~/.claude/hooks/active-venture-refresh.py          # confirm pinboard parsing still works
+python3 ~/.claude/hooks/prune-memory-dryrun.py             # confirm memory dir audit is clean
+```
+
+Spot-check 5 random `_learnings.md` files: do their new tags retrieve correctly with `grep`? If not, you have residual drift.
+
+### Step 10 — Log the refactor (15 minutes)
+
+Append an entry to `Vault/AI Toolkit/agentic-architecture.md` Evolution log: what changed in the vocabulary, why, which dependent skills/scripts were updated, what the next refactor will likely need to address. This entry is the most valuable artifact the refactor produces — it tells future-you what your past judgment was.
+
+### When the refactor isn't enough
+
+If you find yourself doing the refactor *quarterly*, the system is wrong for your work. Either your work is changing faster than any taxonomy can keep up (consider a hybrid graph-extraction layer to supplement the controlled vocab), or you're over-engineering the vocab (consolidate categories, fewer namespaces). Step back.
+
+If the refactor takes more than 3 weeks elapsed, something is wrong with the vocabulary design rather than the refactor process. Don't power through; rethink the namespaces.
 
 ---
 
 ## Closing — when to abandon
 
-Memory-os patterns earn their keep inside the envelope. The envelope is in `docs/envelope.md` and it's load-bearing. Re-read it once a year. If you're outside the envelope — your corpus has multiple writers, your scale exceeds personal, your model can't iterate on retrieval — switch to the right tool.
+Memory-os patterns earn their keep inside the envelope. The envelope is in [`envelope.md`](envelope.md). Re-read it once a year. If you're outside the envelope — your corpus has multiple writers, your scale exceeds personal, your model can't iterate on retrieval, your work shape doesn't translate cleanly — switch to the right tool.
 
-Otherwise, do the rituals, run the cron, refactor at year 2-3, and let the compounding work.
+Otherwise: let the cron run, capture decisions into `_learnings.md` when they happen, run quality skills on what's about to leave your hands, refactor the vocab every 18–24 months. The system survives your bad weeks. Act like it does.
