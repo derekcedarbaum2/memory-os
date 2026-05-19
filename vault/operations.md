@@ -36,6 +36,21 @@ Optional fields as applicable: `product`, `program`, `related: [[wiki-links]]`, 
 
 Backfill frontmatter (including tags) when editing an old file without it.
 
+## Citations on every claim (`_learnings.md` and `_strategy.md`)
+
+Every bullet under `## Learnings`, `## Anti-patterns`, `## Principles`, `## Decisions`, or any claim-shaped section in a venture's `_learnings.md` or `_strategy.md` should end with a source link in one of these forms:
+
+- `[[session-archive-name]]` — the chat that produced the insight
+- `[[voice-memo-name]]` — voice memo source
+- `[[document-name]]` — vault doc that documents the underlying event
+- `(YYYY-MM-DD)` — inline date for in-conversation observations with no archived source
+
+Open Threads bullets are exempt (they describe state, not claims).
+
+**Why:** Unsourced claims rot silently and lose provenance — when a claim is later questioned or contradicted, the source is unrecoverable. GBrain-style self-citation is the cheap counter; the vault grows graph-shaped instead of pile-shaped.
+
+**Backfill rule:** When editing an existing `_learnings.md`, add citations to the bullets you touch; don't backfill the whole file. `vault-lint` check 2f flags unsourced claim bullets as Warning.
+
 ## Cron windows (shared-file write awareness)
 
 Three crons fire and write to shared vault files:

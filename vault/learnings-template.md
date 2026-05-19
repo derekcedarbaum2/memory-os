@@ -125,7 +125,12 @@ Wiki-links to related principles, locations, or other ventures. Link liberally. 
 ## Hygiene rules
 
 1. **Append only.** Never rewrite a Learning. If you change your mind, append a contradicting Learning and let both stand.
-2. **Cite sources.** Every Learning ends with a `[[session-id]]`. If you can't cite, you're not sure enough to commit.
+2. **Cite sources on every claim.** Every bullet under `## Learnings`, `## Anti-patterns`, `## Principles`, `## Decisions`, or any claim-shaped section ends with a source link. Acceptable forms:
+   - `[[session-archive-name]]` — the chat that produced the insight
+   - `[[voice-memo-name]]` — voice memo source
+   - `[[document-name]]` — vault doc documenting the underlying event
+   - `(YYYY-MM-DD)` — inline date when there is no archived source
+   `## Open Threads` is exempt (it describes state, not claims). If you can't cite, you're not sure enough to commit. `vault-lint` check 2f flags unsourced claim bullets.
 3. **Move resolved threads.** Open Thread → resolved? Move it to Learnings or Key Decisions with a resolution note.
 4. **Update the snapshot in place.** That's the only section that's not append-only. Keep it short.
 5. **Cross-reference.** Wiki-link to principles, sibling ventures, and locations. The graph is your indexer.

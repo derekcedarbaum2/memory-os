@@ -199,6 +199,21 @@ Skip if the vault doesn't use typed-entity folders — note in Skipped Checks.
 
 Warn if MEMORY.md is over 200 lines (truncation risk). **Severity: Warning.**
 
+**2f. Unsourced claims in `_learnings.md` / `_strategy.md`**
+
+For every `_learnings.md` and `_strategy.md`, parse bullets under any claim-shaped section: `## Learnings`, `## Anti-patterns`, `## Principles`, `## Decisions`. A bullet is **sourced** if it ends with `[[wiki-link]]` OR an inline date `(YYYY-MM-DD)`. Bullets under `## Open Threads`, `## Current state`, `## Backlog`, `## Status snapshot`, or `## Related Sessions` are **exempt** (state, not claims).
+
+Report grouped by file — count + top 3 example bullets per file. **Severity: Warning.** Backfilling the whole vault is not the goal — the rule applies on edits going forward and surfaces drift in active files.
+
+**2g. Trajectory regression — active ventures untouched ≥30 days**
+
+For each active venture pointer in `MEMORY.md`, locate its `_learnings.md` and read filesystem mtime. Compute days since last edit.
+
+- ≥30 days → **Warning** ("stale active venture — touch or move to backlog")
+- ≥60 days → **Critical** ("dormant — consider demoting from active or archiving")
+
+Active ventures that no longer get edits are silent decay. The 30-day threshold is the early flag; the 60-day threshold is the hard demotion prompt. Report: venture name, days since mtime, recommended action.
+
 ### Step 3: Semantic Checks (AI; use carefully)
 
 Run via subagent (Agent tool, `subagent_type: "Explore"`) for context isolation. Reserve main-context reasoning for the report write-up.
@@ -289,6 +304,8 @@ tags: [lint, vault-hygiene, automated]
 | Orphaned pages | {N} | Info |
 | Oversized `_learnings.md` | {N} | Warning |
 | MEMORY.md size | {ok / warn} | Warning |
+| Unsourced claims | {N} | Warning |
+| Trajectory regression (stale active ventures) | {N} | {Warning / Critical} |
 | Contradictions | {N} | {Critical/Warning} |
 | Stale bullets | {N} | Warning |
 | Knowledge gaps | {N} | Warning |
@@ -342,7 +359,24 @@ For each cluster:
 ## 9. Duplicate Concepts
 {Groups of duplicates with consolidation suggestion}
 
-## 10. Skipped Checks
+## 10. Unsourced Claims
+For each file with violations:
+- **File:** {path}
+- **Unsourced bullets:** {N}
+- **Examples:**
+  - `{bullet text without trailing citation}`
+  - …
+- **Recommended fix:** add `[[session-id]]`, `[[voice-memo]]`, `[[document]]`, or `(YYYY-MM-DD)` to each.
+
+## 11. Trajectory Regression — Stale Active Ventures
+For each:
+- **Venture:** {name}
+- **`_learnings.md`:** {path}
+- **Last touched:** {N days ago}
+- **Severity:** {Warning ≥30 days / Critical ≥60 days}
+- **Recommended action:** {touch / demote from active list / archive}
+
+## 12. Skipped Checks
 {Checks that could not run — e.g., "Jira MCP unavailable; ticket-staleness skipped." "Orphan check skipped — vault uses path-style wikilinks."}
 
 ## 11. Next Steps for User
