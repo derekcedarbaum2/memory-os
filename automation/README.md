@@ -14,6 +14,7 @@ This folder is the load-bearing evidence for the "self-maintaining" claim in the
 | **Daily 7:00 AM PT** | external | Voice-memo sync (Monologue → vault). |
 | **Daily 7:15, 11, 14, 17 PT** | [`generate-today.sh`](generate-today.sh) | Regenerates `Vault/Today.md` (calendar + due tasks + recent activity + open threads). |
 | **Daily 7:30 AM PT** | [`auto-distill-readwise.sh`](auto-distill-readwise.sh) | Distills the day's Readwise highlights into the right domain playbook. |
+| **Sunday 9:00 PM PT** | [`tweet-pipeline/pull.py`](tweet-pipeline/) | Pulls x.com URLs shared in your Slack workspace, scrapes the full tweet bodies with cookies imported from your real browser, topic-routes into `Vault/Research/X Research/tweets-*.md`. |
 
 The launchd plists for each schedule live in [`plists/`](plists/). They are macOS-specific. The shell scripts are portable; the schedulers are not.
 
@@ -21,6 +22,7 @@ The launchd plists for each schedule live in [`plists/`](plists/). They are macO
 
 - [`tag-backfill.py`](tag-backfill.py) — one-time idempotent script that walks the memory dir + vault and fills in controlled-vocabulary `tags:` based on path conventions. Re-runnable. Used once after the May 2026 reorg to backfill ~30 memory files + 550 vault files in one pass.
 - [`archive-session.sh`](archive-session.sh) — SessionEnd hook that snapshots a Claude Code session into `Vault/AI Toolkit/CC Chat History/`.
+- [`tweet-pipeline/import_cookies.py`](tweet-pipeline/import_cookies.py) — one-time setup + recurring auth refresh for the tweet pipeline. Lifts `x.com` cookies from your real browser (Chrome / Safari / Brave / Firefox) and saves them as a Playwright `storage_state.json`. Re-run when X invalidates the session.
 
 ## Why the schedule looks like this
 

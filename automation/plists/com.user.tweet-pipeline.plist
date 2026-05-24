@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.user.tweet-pipeline</string>
+
+    <!-- Edit absolute paths to match your checkout. -->
+    <key>ProgramArguments</key>
+    <array>
+        <string>/Users/YOURUSER/projects/memory-os/automation/tweet-pipeline/.venv/bin/python</string>
+        <string>/Users/YOURUSER/projects/memory-os/automation/tweet-pipeline/pull.py</string>
+    </array>
+
+    <!-- Weekly Sunday at 21:00 local. If Mac is asleep, runs at next wake. -->
+    <key>StartCalendarInterval</key>
+    <dict>
+        <key>Weekday</key>
+        <integer>0</integer>
+        <key>Hour</key>
+        <integer>21</integer>
+        <key>Minute</key>
+        <integer>0</integer>
+    </dict>
+
+    <key>RunAtLoad</key>
+    <false/>
+
+    <key>StandardOutPath</key>
+    <string>/Users/YOURUSER/projects/memory-os/automation/tweet-pipeline/launchd.out.log</string>
+
+    <key>StandardErrorPath</key>
+    <string>/Users/YOURUSER/projects/memory-os/automation/tweet-pipeline/launchd.err.log</string>
+
+    <key>WorkingDirectory</key>
+    <string>/Users/YOURUSER/projects/memory-os/automation/tweet-pipeline</string>
+
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>/usr/local/bin:/usr/bin:/bin:/opt/homebrew/bin</string>
+    </dict>
+</dict>
+</plist>

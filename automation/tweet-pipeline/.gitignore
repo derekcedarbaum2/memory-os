@@ -1,0 +1,7 @@
+.env
+storage_state.json
+state.json
+runs.log
+.venv/
+__pycache__/
+*.pyc
